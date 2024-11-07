@@ -2,68 +2,157 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - tech0-gen-7-step4-studentwebapp-pos-15
+# YAMLとは：
+# YAML（YAML Ain't Markup Language）は、人間にとって読みやすく書きやすいデータシリアライゼーション形式です。
+# 設定ファイルやデータ交換に広く使用されており、特にGitHub Actionsのワークフロー定義によく用いられます。
+# YAMLは階層構造を持ち、インデントを使って構造を表現します。キーと値のペア、リスト、ネストされた構造をサポートしています。
+
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+# これらのコメントは、Azure Web Apps Deployアクションとその他のAzure用GitHub Actionsに関するドキュメントへのリンクを提供しています。
+# 開発者がより詳細な情報を必要とする場合に参照できます。
+
+name: Build and deploy Node.js app to Azure Web App - tech0-gen-7-step4-studentwebapp-pos-15
+# 'name:'はこのワークフローの名前を定義します。
+# この名前はGitHubのActionsタブに表示され、ワークフローを識別するのに役立ちます。
+# ここでは、Node.jsアプリをAzure Web Appにビルドしてデプロイすることを示しています。
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+# 'on:'セクションは、このワークフローをトリガーする条件を定義します。
+# 'push:'は、指定されたブランチ（ここではmain）にコードがプッシュされたときにワークフローを実行します。
+# 'workflow_dispatch:'は、手動でワークフローを実行できるようにします。これにより、開発者はGitHubのインターフェースからワークフローを直接起動できます。
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # 'jobs:'セクションは、このワークフローで実行される一連のジョブを定義します。
+    # 'build:'は最初のジョブの名前です。
+    # 'runs-on: ubuntu-latest'は、このジョブがUbuntuの最新バージョンを実行する仮想マシン上で実行されることを指定します。
 
     steps:
       - uses: actions/checkout@v4
+      # 'steps:'セクションは、ジョブ内で実行される一連のタスクを定義します。
+      # この行は'actions/checkout'アクションのバージョン4を使用して、リポジトリのコードをチェックアウト（ダウンロード）します。
+      # これにより、ワークフローが最新のコードで作業できるようになります。
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
         with:
-          python-version: '3.11'
+          node-version: "20.x"
+      # このステップはNode.js環境をセットアップします。
+      # 'uses: actions/setup-node@v3'は、Node.jsをセットアップするアクションを使用することを指定します。
+      # 'with:'セクションでは、使用するNode.jsのバージョンを'20.x'と指定しています。これは20.xシリーズの最新バージョンを使用することを意味します。
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
+      #初回Pythonでセットしたため作られてしまったものと思う（もぎ）
+      # - name: Create and start virtual environment
+      #   run: |
+      #     python -m venv venv
+      #     source venv/bin/activate
+
+      # - name: Install dependencies
+      #   run: pip install -r requirements.txt
+
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+      # このステップでは、Node.jsプロジェクトの依存関係のインストール、ビルド、テストを行います。
+      # 'npm install'はプロジェクトの依存関係をインストールします。
+      # 'npm run build --if-present'は、package.jsonにbuildスクリプトが定義されている場合にのみビルドを実行します。
+      # 'npm run test --if-present'は、package.jsonにtestスクリプトが定義されている場合にのみテストを実行します。
+
+      - name: Copy artifact for deployment job
+        run: |
+          mkdir -p deploy
+          if [ -d ".next/standalone" ]; then
+            cp -r ./.next/standalone/. ./deploy
+          else
+            echo ".next/standalone directory not found"
+          fi
+          if [ -d "public" ]; then
+            cp -r ./public ./deploy
+          else
+            echo "public directory not found, skipping"
+          fi
+          if [ -d ".next/static" ]; then
+            mkdir -p ./deploy/.next/static
+            cp -r ./.next/static/. ./deploy/.next/static
+          else
+            echo ".next/static directory not found"
+          fi
+          cp package.json ./deploy/ || echo "package.json not found"
+          cp next.config.mjs ./deploy/ || echo "next.config.mjs not found"
+      # このステップは、デプロイに必要なファイルを'deploy'ディレクトリにコピーします。
+      # Next.jsプロジェクトの場合、standaloneビルド、publicディレクトリ、staticファイル、package.json、next.config.mjsをコピーします。
+      # 各ディレクトリやファイルが存在しない場合は、エラーメッセージを表示します。
+
+      # - name: Zip artifact for deployment
+      #   run: zip release.zip ./* -r
+
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: zip release.zip ./deploy -r
+      # このステップでは、'deploy'ディレクトリの内容を'release.zip'というZIPファイルに圧縮します。
+      # '-r'オプションは、ディレクトリを再帰的に圧縮することを指示します。
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
-          name: python-app
-          path: |
-            release.zip
-            !venv/
+          name: node-app
+          path: release.zip
+      # このステップでは、作成したZIPファイルをGitHub Actionsのアーティファクトとしてアップロードします。
+      # 'uses: actions/upload-artifact@v4'は、アーティファクトをアップロードするアクションを使用することを指定します。
+      # 'name: node-app'はアーティファクトの名前を設定します。
+      # 'path: release.zip'はアップロードするファイルのパスを指定します。
+      # with:
+      # name: python-app
+      # path: |
+      #   release.zip
+      #   !venv/
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: "Production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+    # 'deploy:'は2つ目のジョブを定義します。このジョブはアプリケーションをデプロイします。
+    # 'needs: build'は、このジョブが'build'ジョブの完了後にのみ実行されることを指定します。
+    # 'environment:'セクションは、デプロイ環境を'Production'と定義し、デプロイ後のURLを指定します。
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: python-app
+          name: node-app
+      # このステップでは、先ほどアップロードしたアーティファクトをダウンロードします。
+      # 'uses: actions/download-artifact@v4'は、アーティファクトをダウンロードするアクションを使用することを指定します。
+      # 'name: node-app'は、ダウンロードするアーティファクトの名前を指定します。
+      # with:
+      #   name: python-app
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
+      # このステップでは、ダウンロードしたZIPファイルを解凍します。
 
-      
-      - name: 'Deploy to Azure Web App'
+      - name: "Deploy to Azure Web App"
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'tech0-gen-7-step4-studentwebapp-pos-15'
-          slot-name: 'Production'
+          app-name: "tech0-gen-7-step4-studentwebapp-pos-15"
+          slot-name: "Production"
+          package: ./deploy #大島コードより追加
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D2C077EFF4B0466997DD21A831EE9607 }}
+
+      # このステップでは、アプリケーションをAzure Web Appにデプロイします。
+      # 'uses: azure/webapps-deploy@v3'は、Azure Web Appへのデプロイを行うアクションを使用することを指定します。
+      # 'app-name:'はデプロイ先のAzure Web Appの名前を指定します。
+      # 'slot-name:'はデプロイ先のスロットを指定します（ここでは'Production'）。
+      # 'package:'はデプロイするファイルのパスを指定します。
+      # 'publish-profile:'はAzureの公開プロファイルを指定します。これはGitHubのシークレットとして保存されています。
