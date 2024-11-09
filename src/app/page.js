@@ -9,6 +9,11 @@ import '../styles/main.css';
 
 
 const Page = () => {
+  // エラー確認用
+  useEffect(() => {
+    console.log('BACKEND_API:', process.env.NEXT_PUBLIC_BACKEND_API);
+  }, []);
+
   const [productData, setProductData] = useState(null);
   const [purchases, setPurchases] = useState([]);
   const [total, setTotal] = useState(0); // 合計金額のステートを追加
