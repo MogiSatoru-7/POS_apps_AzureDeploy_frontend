@@ -1,7 +1,7 @@
 // src/app/page.js
 "use client";  // Client Componentとして動作させる
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // useEffectを追加
 import ProductInput from '../../components/ProductInput';
 import ProductDisplay from '../../components/ProductDisplay';
 import PurchaseList from '../../components/PurchaseList';
