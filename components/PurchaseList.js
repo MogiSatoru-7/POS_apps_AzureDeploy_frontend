@@ -11,7 +11,7 @@ const PurchaseList = ({ purchases, total, onPurchase }) => {
     try {
       // 各商品をバックエンドに送信する
       for (const item of purchases) {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/purchase`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API}/purchase`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

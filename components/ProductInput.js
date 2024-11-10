@@ -15,7 +15,7 @@ const ProductInput = ({ onProductData }) => {
     }
     
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/products/${productCode}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/products/${productCode}`);
       if (!response.ok) {
         // throw new Error("商品が見つかりません");
         // エラーをスローせず、エラーメッセージを設定へ変更
