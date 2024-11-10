@@ -32,7 +32,9 @@ jobs:
     # 'jobs:'セクションは、このワークフローで実行される一連のジョブを定義します。
     # 'build:'は最初のジョブの名前です。
     # 'runs-on: ubuntu-latest'は、このジョブがUbuntuの最新バージョンを実行する仮想マシン上で実行されることを指定します。
-
+    env:
+      NEXT_PUBLIC_API: ${{ secrets.NEXT_PUBLIC_API }}
+    #GPTの指示でenvを追加
     steps:
       - uses: actions/checkout@v4
       # 'steps:'セクションは、ジョブ内で実行される一連のタスクを定義します。
