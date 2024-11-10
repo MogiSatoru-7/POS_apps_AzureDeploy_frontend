@@ -20,7 +20,7 @@ const ProductInput = ({ onProductData }) => {
         // throw new Error("商品が見つかりません");
         // エラーをスローせず、エラーメッセージを設定へ変更
         console.error(`HTTP error! status: ${response.status}`, response);
-        //デプロイエラー対応で挿入
+        //デプロイエラー対応で挿入（ブラウザコンソール）
         setErrorMessage("商品がマスタ未登録です");  
         return;      
       }
