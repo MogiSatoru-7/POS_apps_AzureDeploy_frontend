@@ -23,10 +23,11 @@ const ProductInput = ({ onProductData }) => {
         return;      
       }
       const productData = await response.json();
+      console.log('Fetched data:', productData); // データの確認
       onProductData(productData); // 親コンポーネントに取得した商品情報を渡す
       setErrorMessage(''); // 正常時にはエラーメッセージをクリア
     } catch (error) {
-      console.error("Error fetching product:", error);
+      console.error("Error fetching product data:", error);
       setErrorMessage("商品がマスタ未登録です"); // 商品が見つからない場合にメッセージを設定
     }
   };
