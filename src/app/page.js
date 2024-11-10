@@ -11,7 +11,7 @@ import '../styles/main.css';
 const Page = () => {
   // エラー確認用
   useEffect(() => {
-    console.log('BACKEND_API:', process.env.NEXT_PUBLIC_BACKEND_API);
+    console.log('BACKEND_API:', process.env.NEXT_PUBLIC_API);
   }, []);
 
   const [productData, setProductData] = useState(null);
