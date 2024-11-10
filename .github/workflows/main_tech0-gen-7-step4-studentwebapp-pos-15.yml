@@ -33,7 +33,7 @@ jobs:
     # 'build:'は最初のジョブの名前です。
     # 'runs-on: ubuntu-latest'は、このジョブがUbuntuの最新バージョンを実行する仮想マシン上で実行されることを指定します。
     env:
-      NEXT_PUBLIC_API: ${{ secrets.NEXT_PUBLIC_API }}
+      NEXT_PUBLIC_API: ${{ secrets.NEXT_PUBLIC_API }}  # 環境変数をbuildジョブに追加
     #GPTの指示でenvを追加
     steps:
       - uses: actions/checkout@v4
@@ -121,6 +121,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    env: # ここに環境変数を追加
+      NEXT_PUBLIC_API: ${{ secrets.NEXT_PUBLIC_API }} # 環境変数をdeployジョブに追加  
     environment:
       name: "Production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
