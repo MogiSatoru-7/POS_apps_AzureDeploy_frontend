@@ -9,7 +9,7 @@ import '../styles/main.css';
 
 
 const Page = () => {
-  // エラー確認用
+  // エラー確認用（ブラウザコンソールに表示）
   useEffect(() => {
     console.log('NEXT_PUBLIC_API:', process.env.NEXT_PUBLIC_API);
   }, []);
